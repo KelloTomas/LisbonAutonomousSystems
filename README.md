@@ -14,3 +14,8 @@ rostopic pub /RosAria/cmd_vel geometry_msgs/Twist "{linear: {x: -0.1, y: 0.0, z:
 rostopic pub /RosAria/cmd_vel geometry_msgs/Twist "{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.1}}"
 rostopic pub /RosAria/cmd_vel geometry_msgs/Twist "{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}"
 
+#WIFI
+sudo iwlist wlp2s0 scan | grep -e 'Signal level' -e Address
+sudo iwlist wlp2s0 scan | grep -oP -e "Signal level=\K.*"
+List only MAC address and Signal strength
+sudo iwlist wlp2s0 scan | grep -oP '(Address: |Signal level=)\K\S*'
