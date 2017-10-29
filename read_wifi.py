@@ -1,13 +1,15 @@
 #!/usr/bin/python
 import subprocess
 import time
+import sys
 
 def ReadWifiFromFile(rFile):
 	wifi = dict()
 	while(True):
 		data = rFile.readline().split()
 		if (len(data) == 1):
-			time.sleep(float(data[0]))
+			if (EnableTiming):
+				time.sleep(float(data[0]))
 			return wifi
 		if(len(data) == 0):
 			return wifi
@@ -26,26 +28,37 @@ def ReadWifi():
 			key = ""
 	return wifi
 
-WriteToFile = False
-ReadFromFile = True
+WriteToFile = True
+ReadFromFile = False
+EnableTiming = True
+if (WriteToFile or ReadFromFile):
+	if (len(sys.argv) == 1):
+		print("Define filename as argument")
+		exit()
+
 if (WriteToFile and ReadFromFile):
 	print("Cant read and write from file together")
 	exit()
 count = 1
 
 if (WriteToFile):
-	wFile = open("data_wifi.txt","w")
+	wFile = open(sys.argv[1],"w")
 if (ReadFromFile):
-	rFile = open("data_wifi.txt","r")
+	rFile = open(sys.argv[1],"r")
 while True:
 	s = time.time()
 	if (ReadFromFile):
+		if (rFile.readline() != "next\n"):
+			print("End of input file")
+			break
 		w = ReadWifiFromFile(rFile)
 	else:
 		w = ReadWifi()
 	f = time.time()
 
 	#process data
+	if(WriteToFile):
+		wFile.write("next\n")
 	for key, value in w.iteritems():
 		if (WriteToFile):
 			wFile.write(key + " " + value + "\n")
@@ -55,4 +68,5 @@ while True:
 		wFile.write("{0:.2f}".format(f-s) + "\n")
 	print(str(count) + ". reading for: " + "{0:.2f}".format(f-s) + "sec");
 	count += 1
-	time.sleep(2)
+	if (EnableTiming):
+		time.sleep(2)
