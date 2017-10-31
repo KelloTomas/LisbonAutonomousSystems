@@ -28,7 +28,7 @@ def ReadWifi():
 			key = ""
 	return wifi
 
-WriteToFile = True
+WriteToFile = False
 ReadFromFile = False
 EnableTiming = True
 if (WriteToFile or ReadFromFile):
@@ -46,6 +46,8 @@ if (WriteToFile):
 if (ReadFromFile):
 	rFile = open(sys.argv[1],"r")
 while True:
+        if (EnableTiming):
+                time.sleep(2)
 	s = time.time()
 	if (ReadFromFile):
 		if (rFile.readline() != "next\n"):
@@ -53,7 +55,10 @@ while True:
 			break
 		w = ReadWifiFromFile(rFile)
 	else:
-		w = ReadWifi()
+		try:
+			w = ReadWifi()
+		except:
+			continue
 	f = time.time()
 
 	#process data
@@ -68,5 +73,3 @@ while True:
 		wFile.write("{0:.2f}".format(f-s) + "\n")
 	print(str(count) + ". reading for: " + "{0:.2f}".format(f-s) + "sec");
 	count += 1
-	if (EnableTiming):
-		time.sleep(2)
