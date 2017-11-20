@@ -5,6 +5,10 @@ rostopic list
 
 rostopic pub /RosAria/cmd_vel  geometry_msgs/Twist "linear:  x: 0.0  y: 0.0  z: 0.0 angular:  x: 0.0  y: 0.0  z: 0.1" 
 
+rosrun map_server map_server map1.yaml
+rosrun tf static_transform_publher -1 0 0 0 0 0 map odom 50
+rosrun rviz rviz
+
 # working
 roscore
 rosparam set RosAria/port /dev/pioneer/usb_to_serial_port && rosrun rosaria RosAria

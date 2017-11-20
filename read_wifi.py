@@ -46,8 +46,8 @@ if (WriteToFile):
 if (ReadFromFile):
 	rFile = open(sys.argv[1],"r")
 while True:
-        if (EnableTiming):
-                time.sleep(2)
+	if (EnableTiming):
+		time.sleep(2)
 	s = time.time()
 	if (ReadFromFile):
 		if (rFile.readline() != "next\n"):
