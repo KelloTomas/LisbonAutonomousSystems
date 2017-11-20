@@ -7,6 +7,7 @@ rostopic pub /RosAria/cmd_vel  geometry_msgs/Twist "linear:  x: 0.0  y: 0.0  z: 
 
 rosrun map_server map_server map1.yaml
 rosrun tf static_transform_publher -1 0 0 0 0 0 map odom 50
+roslaunch hokuyo_driver hokuyo_driver.launch
 rosrun rviz rviz
 
 # working
