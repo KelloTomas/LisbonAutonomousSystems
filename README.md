@@ -1,12 +1,26 @@
 # SAutLisboaErasmus
 ROS project
 
+roscore
+rosparam set RosAria/port /dev/pioneer/usb_to_serial_port && rosrun rosaria RosAria
+rosrun map_server map_server map1.yaml
+
+rosrun tf static_transform_publher -1 0 0 0 0 0 map odom 50
+
+roslaunch hokuyo_driver hokuyo_driver.launch
+rostopic echo /RosAria/pose
+rosrun rviz rviz
+
 rostopic list
+
 
 rostopic pub /RosAria/cmd_vel  geometry_msgs/Twist "linear:  x: 0.0  y: 0.0  z: 0.0 angular:  x: 0.0  y: 0.0  z: 0.1" 
 
+## Publish map to RVIZ
 rosrun map_server map_server map1.yaml
 rosrun tf static_transform_publher -1 0 0 0 0 0 map odom 50
+
+## Start laser scanner
 roslaunch hokuyo_driver hokuyo_driver.launch
 rosrun rviz rviz
 

@@ -43,14 +43,15 @@ def GetAvgWifi():
 	count = 0
 	while True:
 	        time.sleep(2)
-		if count == 5:
+		if count == 2:
 			return
 		print("reading " + str(count)+"\n")
 		try:
 			w = ReadWifi()
 		except:
+			time.sleep(2)
 			continue
-	
+
 		for key, value in w.iteritems():
 
 			if key not in wifis:
@@ -64,7 +65,7 @@ if __name__ == '__main__':
 		exit()
 	listener()
 	GetAvgWifi()
-	wFile = open(sys.argv[1],"w")
+	wFile = open(sys.argv[1],"a")
 	wFile.write("NEXT\n")
 	wFile.write(str(x) + "," + str(y)+"\n")
 	for key, value in wifis.iteritems():
