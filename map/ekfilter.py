@@ -1,7 +1,7 @@
 #----------------------------------------------------#
 #             Kalman filter 3.0
 #
-#   Copyright: Martin Skaldebø
+#   Copyright: Martin Skaldebo
 #----------------------------------------------------#
 from numpy.linalg import inv
 from jacobmat import jacobmat

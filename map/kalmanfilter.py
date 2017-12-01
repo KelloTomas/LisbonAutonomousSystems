@@ -33,7 +33,10 @@ import matplotlib.pyplot as plt
 #h = lambda x: np.array([[x[0,0]]]);
 #f = lambda x: np.array([[x[0,0] +3/N], [x[1,0] + 3/N]]);
 
-def ReadWifiFromFile(rFile):
+def ReadWifiFromFile():
+  # ToDo
+
+  rFile = open('signal2.txt','r')
   wifi = dict()
   if (rFile.readline() != "NEXT\n"):
     #print("End of input file")
@@ -98,7 +101,7 @@ x = np.array([[14.366],[0.374]]);
 
 #init transform
 
-rospy.init_node('my_static_tf2_broadcaster')
+rospy.init_node('my_static_broadcast')
 broadcaster = tf2_ros.StaticTransformBroadcaster()
 static_transformStamped = geometry_msgs.msg.TransformStamped()
 static_transformStamped.header.stamp = rospy.Time.now()
@@ -107,14 +110,17 @@ static_transformStamped.child_frame_id = "robotbase"
 static_transformStamped.transform.translation.x = 0
 static_transformStamped.transform.translation.y = 0
 static_transformStamped.transform.translation.z = 0
-static_transformStamped.transform.rotation.x = 0
-static_transformStamped.transform.rotation.y = 0
-static_transformStamped.transform.rotation.z = 0
-static_transformStamped.transform.rotation.w = 0
+quat = tf.transformations.quaternion_from_euler(0,0,0)
+static_transformStamped.transform.rotation.x = quat[0]
+static_transformStamped.transform.rotation.y = quat[1]
+static_transformStamped.transform.rotation.z = quat[2]
+static_transformStamped.transform.rotation.w = quat[3]
 #-----------------------------------------------------------------#
 #   Running the Kalman filter function
 for k in range (0,N):
+  print("reading: " + str(k))
   #State vector
+  # ToDo read odometry
   s[0,0] = 14.366 + k/10;
   s[1,0] = 1.63;
   sVector[:,k] = s[:,0];
@@ -128,8 +134,7 @@ for k in range (0,N):
   mapp1 = open('wifi_map_lab.txt', 'r')
   mapp = mapp1.readlines()
 
-  rFile = open('signal2.txt','r')
-  w = ReadWifiFromFile(rFile)
+  w = ReadWifiFromFile()
 
   z = zconverter(w,mapp);
   zVector[:,k] = z[:,0]
@@ -138,14 +143,14 @@ for k in range (0,N):
   for kk in range (0,n):
     xVector[kk,k] = x[kk,0];
   
-  static_transformStamped.transform.translation.x = x[0,0] -s[0,0];
-  static_transformStamped.transform.translation.y = x[1,0] -s[1,0];
+  static_transformStamped.transform.translation.x = float(x[0,0] - s[0,0]);
+  static_transformStamped.transform.translation.y = float(x[1,0] - s[1,0]);
   broadcaster.sendTransform(static_transformStamped)
   
-  time.sleep(2)
+  time.sleep(3)
 
 
-
+exit()
 
 
 

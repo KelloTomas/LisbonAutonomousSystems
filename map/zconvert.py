@@ -42,7 +42,7 @@ def zconverter(w,mapp):
 			count_vec = count_vec + [count];		
 	if delta_vec == []:
 		print ('No Matching signals')
-		return
+		return np.array([[0], [0]]);
 	div = np.power(count_vec,0.5)
 	winner = np.divide(delta_vec, div)
 
@@ -102,16 +102,8 @@ def zconverter(w,mapp):
 			avg_counter = avg_counter + 1;
 	if avg_counter == 0:
 		print ('avg_counter = 0')
-		return
+		return np.array([[0], [0]]);
 	xavg = xavg/avg_counter;
 	yavg = yavg/avg_counter;
 
-	z = np.array([[xavg], [yavg]]);
-
-	return (z)
-
-
-
-
-
-
+	return np.array([[xavg], [yavg]]);
