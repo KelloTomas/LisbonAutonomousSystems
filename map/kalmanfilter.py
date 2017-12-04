@@ -139,16 +139,19 @@ if(ReadOdometry):
   listener()
 lastRobotX = 0
 lastRobotY = 0
+
+if (len(sys.argv) != 2):
+  print("Define filename as argument")
+  exit()
+wFile = open(sys.argv[1],"a")
 while(True):
   #simulate movement
-  robotX = robotX +1
-  robotY = robotY +1
   count = count + 1
   print("reading: " + str(count))
 
   #Odometry
-  odom[0,0] = lastRobotX - robotX
-  odom[1,0] = lastRobotY - robotY
+  odom[0,0] = robotX - lastRobotX 
+  odom[1,0] = robotY - lastRobotY
   lastRobotX = robotX
   lastRobotY = robotY
   print(robotX)
@@ -160,6 +163,11 @@ while(True):
   w = ReadWifi()
   #except Exception as e:
   #  continue
+  wFile.write("NEXT\n")
+  wFile.write(str(robotX) + "," + str(robotY)+"\n")
+  for key, value in w.iteritems():
+    wFile.write(key + " " + value + "\n")
+  wFile.write("END\n")
 
   z = zconverter(w,wifiDB);
 
