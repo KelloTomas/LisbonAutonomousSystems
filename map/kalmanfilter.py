@@ -25,6 +25,25 @@ from ekfilter import ekf
 from jacobmat import jacobmat
 
 import matplotlib.pyplot as plt
+ReadFromFile = False
+ReadOdometry = True
+robotX = 0
+robotY = 0
+def callbackPose(data):
+  d = data.pose.pose
+  global robotY
+  global robotX
+  robotX = d.position.x
+  robotY = d.position.y
+  return robotX
+  return robotY
+  #print("\n\nPose Position\n" + str(d.position.x) + "\n" + str(d.position.y) + "\nPose Orientation\n" + str(d.orientation.z) + "\n" + str(d.orientation.w))
+
+def listener():
+  #rospy.init_node('listener', anonymous=True)
+  rospy.Subscriber("/RosAria/pose", Odometry, callbackPose)
+  #rospy.spin()
+
 
 #h = lambda x: np.array([[0.75*x[0,0]]])
 #f = lambda x: np.array([[x[0,0] * np.cos(x[0,0]*2*pi/N)+2], [x[1,0] * np.cos(x[1,0]*2*pi/N)+2 ]])
@@ -34,13 +53,12 @@ import matplotlib.pyplot as plt
 
 #h = lambda x: np.array([[x[0,0]]]);
 #f = lambda x: np.array([[x[0,0] +3/N], [x[1,0] + 3/N]]);
-ReadFromFile = False
+
 def ReadWifi():
   if (ReadFromFile):
     rFile = open('signal2.txt','r')
     wifi = dict()
     if (rFile.readline() != "NEXT\n"):
-      #print("End of input file")
       return wifi
     while(True):
       data = rFile.readline().split()
@@ -51,9 +69,7 @@ def ReadWifi():
       wifi[data[0]] = data[1]
   else:
     wifi = dict()
-    print("Started reading")
-    data = subprocess.check_output("iwlist wlp2s0 scan | grep -oP '(Address: |Signal level=)\K\S*'", shell=True)
-    print("wifi readed")
+    data = subprocess.check_output("sudo iwlist wlp2s0 scan | grep -oP '(Address: |Signal level=)\K\S*'", shell=True)      
     key = ""
     for line in data.splitlines():
       if(key == ""):
@@ -101,7 +117,7 @@ broadcaster = tf2_ros.StaticTransformBroadcaster()
 static_transformStamped = geometry_msgs.msg.TransformStamped()
 static_transformStamped.header.stamp = rospy.Time.now()
 static_transformStamped.header.frame_id = "wifi_base"
-static_transformStamped.child_frame_id = "robot_base"
+static_transformStamped.child_frame_id = "odom"
 static_transformStamped.transform.translation.x = 0
 static_transformStamped.transform.translation.y = 0
 static_transformStamped.transform.translation.z = 0
@@ -119,8 +135,8 @@ start_new_thread( RunCommand, ( "rosrun tf static_transform_publisher 9.5 9 0 0.
 #   Running the Kalman filter function
 count = 0
 wifiDB = open('wifi_map_lab.txt', 'r').readlines()
-robotX = 10
-robotY = 20
+if(ReadOdometry):
+  listener()
 lastRobotX = 0
 lastRobotY = 0
 while(True):
@@ -135,19 +151,26 @@ while(True):
   odom[1,0] = lastRobotY - robotY
   lastRobotX = robotX
   lastRobotY = robotY
+  print(robotX)
+  print(robotY)
 
   #WiFi transform to coordinates
+  #try:
+  #  w = ReadWifi()
   w = ReadWifi()
+  #except Exception as e:
+  #  continue
+
   z = zconverter(w,wifiDB);
 
   # run EKF
   [x, P] = ekf(f,x,P,h,z,Q,R,n,odom);
 
   # broadcast transform  
-  static_transformStamped.transform.translation.x = float(x[0,0]);
-  #static_transformStamped.transform.translation.x = float(x[0,0] - robotX);
-  static_transformStamped.transform.translation.y = float(x[1,0]);
-  #static_transformStamped.transform.translation.y = float(x[1,0] - robotY);
+  #static_transformStamped.transform.translation.x = float(x[0,0]);
+  static_transformStamped.transform.translation.x = float(x[0,0] - robotX);
+  #static_transformStamped.transform.translation.y = float(x[1,0]);
+  static_transformStamped.transform.translation.y = float(x[1,0] - robotY);
   broadcaster.sendTransform(static_transformStamped)
   
   time.sleep(1)

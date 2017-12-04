@@ -11,6 +11,8 @@ roslaunch hokuyo_driver hokuyo_driver.launch
 rostopic echo /RosAria/pose
 rosrun rviz rviz
 
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=/RosAria/cmd_vel
+
 ## Show wifi on map
 cd LisbonAutonomousSystems/map
 python show_wifi_measure_on_map.py wifi_map_lab.txt
