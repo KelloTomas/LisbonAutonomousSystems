@@ -26,7 +26,8 @@ from jacobmat import jacobmat
 
 import matplotlib.pyplot as plt
 ReadFromFile = False
-ReadOdometry = True
+ReadFromFile2 = True
+ReadOdometry = False
 robotX = 0
 robotY = 0
 def callbackPose(data):
@@ -53,6 +54,22 @@ def listener():
 
 #h = lambda x: np.array([[x[0,0]]]);
 #f = lambda x: np.array([[x[0,0] +3/N], [x[1,0] + 3/N]]);
+
+def ReadWifi2(rFile):
+  if (ReadFromFile2):
+    wifi = dict()
+    robotod = dict()
+    if (rFile.readline() != "NEXT\n"):
+      return wifi, robotod
+    robotod = rFile.readline().split(',')
+    while(True):
+      data = rFile.readline().split()
+      if (len(data) == 0):
+        return wifi, robotod
+      if (len(data) == 1):
+        return wifi, robotod
+      wifi[data[0]] = data[1]
+
 
 def ReadWifi():
   if (ReadFromFile):
@@ -144,6 +161,10 @@ if (len(sys.argv) != 2):
   print("Define filename as argument")
   exit()
 wFile = open(sys.argv[1],"a")
+
+if (ReadFromFile2):
+  rFile = open('ninfrontOfToalte.txt', 'r')
+
 while(True):
   #simulate movement
   count = count + 1
@@ -160,7 +181,12 @@ while(True):
   #WiFi transform to coordinates
   #try:
   #  w = ReadWifi()
-  w = ReadWifi()
+  if (ReadFromFile2):
+    w, robotod = ReadWifi2(rFile)
+    robotX = float(robotod[0])
+    robotY = float(robotod[1])
+  else:
+    w = ReadWifi() 
   #except Exception as e:
   #  continue
   wFile.write("NEXT\n")
@@ -170,6 +196,7 @@ while(True):
   wFile.write("END\n")
 
   z = zconverter(w,wifiDB);
+  print(z)
 
   # run EKF
   [x, P] = ekf(f,x,P,h,z,Q,R,n,odom);

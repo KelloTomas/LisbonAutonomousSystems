@@ -26,7 +26,7 @@ def zconverter(w,mapp):
 				mapp_id = mapp[a];
 				tester = mapp_id[0:17];
 				if len(mapp_id) == 24:
-					tester_value = int(float(mapp_id[19:23]));
+					tester_value = float(mapp_id[18:23]);
 				#Checks one value in map for all the values in signal file
 				
 				for key,value in w.items():
